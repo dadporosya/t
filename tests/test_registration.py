@@ -43,7 +43,7 @@ def test_add_new_user(setup_database, connection):
 Тест успешной аутентификации пользователя.
 Тест аутентификации несуществующего пользователя.
 Тест аутентификации пользователя с неправильным паролем.
-Тест отображения списка пользователей.
+Тест отображения списка пользователей. +
 """
 
 def test_display_users():
@@ -55,3 +55,19 @@ def test_display_users():
             testStr += f"Логин: {user[0]}, Электронная почта: {user[1]}" + "\n"
 
     assert testStr == display_users(), "Неверное отображение"
+
+def test_registration_with_invalid_pass():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT username, password FROM users")
+        for user in cur.fetchall():
+            res = authenticate_user(user[0], user[1] + "67")
+            assert not res, "Пользователь зарегистрировался с неверным паролем"
+
+def test_registration_with_invalid_login():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT username, password FROM users")
+        for user in cur.fetchall():
+            res = authenticate_user(user[0] + "tuntuntunsahur", user[1])
+            assert not res, "Пользователь зарегистрировался с неверным логином"

@@ -41,7 +41,6 @@ def display_users():
             resTxt+=line+"\n"
     return resTxt
 
-
 def user_choice():
     print("\n1. Авторизоваться")
     print("2. Зарегистрироваться")
