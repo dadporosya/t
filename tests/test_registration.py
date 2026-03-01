@@ -41,7 +41,7 @@ def test_add_new_user(setup_database, connection):
 """
 Тест добавления пользователя с существующим логином.
 Тест успешной аутентификации пользователя.
-Тест аутентификации несуществующего пользователя.
+Тест аутентификации несуществующего пользователя. +
 Тест аутентификации пользователя с неправильным паролем или логином. +
 Тест отображения списка пользователей. +
 """
@@ -87,3 +87,17 @@ def test_not_existing_user():
             notExistingPass += chr(ord(user[1][counter % len(user[1])]) + 1)
             counter+=1
         assert not authenticate_user(notExistingLogin, notExistingPass), "Получилась регистрация с несуществующими данными"
+
+def test_success_login():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT username, password FROM users")
+        for user in cur.fetchall():
+            assert authenticate_user(user[0], user[1]), "Не получилось зарегистрироваться с правильными данными"
+
+def test_add_existing_user():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT username, email, password FROM users")
+        for user in cur.fetchall():
+            assert not add_user(user[0], user[1], user[2]), "Был добавлен существующий юзер"
