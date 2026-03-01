@@ -1,7 +1,7 @@
 import pytest
 import sqlite3
 import os
-from registration.registration import create_db, add_user, authenticate_user, display_users
+from registration.registration import create_db, add_user, authenticate_user, display_users, login, main, registration, user_choice
 DB_NAME = 'users.db'
 
 @pytest.fixture(scope="module")
@@ -80,7 +80,7 @@ def test_not_existing_user():
         notExistingLogin = ""
         notExistingPass = ""
         for user in cur.fetchall():
-            # добавляет к тестируемуму логину/паролю символ i-ый,
+            # добавляет к тестируемому логину/паролю символ i-ый,
             # который отличается по юникоду от i-ого символа в каждом другом логине/пароле.
             # таким образом, создается уникальный, не существующий ранее логин/пароль.
             notExistingLogin += chr(ord(user[0][counter % len(user[0])]) + 1)
@@ -101,3 +101,28 @@ def test_add_existing_user():
         cur.execute("SELECT username, email, password FROM users")
         for user in cur.fetchall():
             assert not add_user(user[0], user[1], user[2]), "Был добавлен существующий юзер"
+
+def test_choice_method():
+    case = '1'
+    assert user_choice(forcedChoice=case) == case, "Error"
+
+def test_login_method():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT username, password FROM users")
+        for user in cur.fetchall():
+            assert login(forcedUsername=user[0], forcedPass=user[1]), "Не получилось авторизоваться"
+
+
+def test_registration_method():
+    testUsername = "u"
+    testEmail = "e"
+    testPass = "p"
+    registration(forcedUsername=testUsername, forcedEmail=testEmail, forcedPass=testPass)
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT * FROM users WHERE username = ? AND password = ? AND email = ?",
+            (testUsername, testPass, testEmail)
+        )
+        assert len(cur.fetchall()) > 0, "Не получилось добавить юзера"

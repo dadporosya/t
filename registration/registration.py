@@ -41,11 +41,29 @@ def display_users():
             resTxt+=line+"\n"
     return resTxt
 
-def user_choice():
+def user_choice(forcedChoice=''):
+    if forcedChoice:
+        return forcedChoice
     print("\n1. Авторизоваться")
     print("2. Зарегистрироваться")
     choice = input("Введите ваш выбор (1/2): ")
     return choice
+
+def login(forcedUsername='', forcedPass=''):
+    username = forcedUsername if forcedUsername else input("Введите логин: ")
+    password = forcedPass if forcedPass else input("Введите пароль: ")
+    if authenticate_user(username, password):
+        print("Авторизация успешна.")
+        return True
+    else:
+        print("Неверный логин или пароль.")
+        return False
+
+def registration(forcedUsername='', forcedEmail='', forcedPass=''):
+    username = forcedUsername if forcedUsername else input("Введите логин нового пользователя: ")
+    email = forcedEmail if forcedEmail else input("Введите адрес электронной почты нового пользователя: ")
+    password = forcedPass if forcedPass else input("Введите пароль нового пользователя: ")
+    add_user(username, email, password)
 
 def main():
     create_db()
@@ -54,17 +72,9 @@ def main():
     choice = user_choice()
 
     if choice == '1':
-        username = input("Введите логин: ")
-        password = input("Введите пароль: ")
-        if authenticate_user(username, password):
-            print("Авторизация успешна.")
-        else:
-            print("Неверный логин или пароль.")
+        login()
     elif choice == '2':
-        username = input("Введите логин нового пользователя: ")
-        email = input("Введите адрес электронной почты нового пользователя: ")
-        password = input("Введите пароль нового пользователя: ")
-        add_user(username, email, password)
+        registration()
     else:
         print("Неверный ввод. Пожалуйста, введите 1 для авторизации или 2 для регистрации.")
 
