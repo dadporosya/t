@@ -71,3 +71,19 @@ def test_registration_with_invalid_login():
         for user in cur.fetchall():
             res = authenticate_user(user[0] + "tuntuntunsahur", user[1])
             assert not res, "Пользователь зарегистрировался с неверным логином"
+
+def test_not_existing_user():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT username, password FROM users")
+        counter = 0
+        notExistingLogin = ""
+        notExistingPass = ""
+        for user in cur.fetchall():
+            # добавляет к тестируемуму логину/паролю символ i-ый,
+            # который отличается по юникоду от i-ого символа в каждом другом логине/пароле.
+            # таким образом, создается уникальный, не существующий ранее логин/пароль.
+            notExistingLogin += chr(ord(user[0][counter % len(user[0])]) + 1)
+            notExistingPass += chr(ord(user[1][counter % len(user[1])]) + 1)
+            counter+=1
+        assert not authenticate_user(notExistingLogin, notExistingPass), "Получилась регистрация с несуществующими данными"
