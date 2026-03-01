@@ -2,6 +2,7 @@ import pytest
 import sqlite3
 import os
 from registration.registration import create_db, add_user, authenticate_user, display_users
+DB_NAME = 'users.db'
 
 @pytest.fixture(scope="module")
 def setup_database():
@@ -44,3 +45,13 @@ def test_add_new_user(setup_database, connection):
 Тест аутентификации пользователя с неправильным паролем.
 Тест отображения списка пользователей.
 """
+
+def test_display_users():
+    testStr = ""
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT username, email FROM users')
+        for user in cursor.fetchall():
+            testStr += f"Логин: {user[0]}, Электронная почта: {user[1]}" + "\n"
+
+    assert testStr == display_users(), "Неверное отображение"

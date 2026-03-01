@@ -31,11 +31,15 @@ def authenticate_user(username, password):
         return cursor.fetchone() is not None
 
 def display_users():
+    resTxt = ""
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT username, email FROM users')
         for user in cursor.fetchall():
-            print(f"Логин: {user[0]}, Электронная почта: {user[1]}")
+            line = f"Логин: {user[0]}, Электронная почта: {user[1]}"
+            print(line)
+            resTxt+=line+"\n"
+    return resTxt
 
 
 def user_choice():
@@ -66,4 +70,6 @@ def main():
         print("Неверный ввод. Пожалуйста, введите 1 для авторизации или 2 для регистрации.")
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+        display_users()
